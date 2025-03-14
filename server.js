@@ -5,6 +5,7 @@ const cors = require('cors');
 
 const authRoute = require('./src/routes/authRoutes');
 const noteRoute = require('./src/routes/noteRoutes');
+const categoryRoutes = require('./src/routes/categoryRoutes');
 
 const app = express();
 
@@ -19,5 +20,6 @@ app.use(morgan('dev'));
 
 app.use('/auth', authRoute);
 app.use('/notes', noteRoute);
+app.use('/categories', categoryRoutes);
 
 app.listen(process.env.PORT, () => { console.log(`Server Running on PORT: ${process.env.PORT}`) })
