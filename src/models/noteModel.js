@@ -6,12 +6,14 @@ async function createNote(title, description, additionalInfo, userId) {
     return result.rows[0];
 }
 
-async function getNotesByUserId(userId) {
-    const result = pool.query('SELECT * FROM notes WHERE user_id = $1', [userId]);
+async function getNotesByUserId(userId, page = 1, limit = 10) {
+    const count = await pool.query('SELECT COUNT(*) FROM notes WHERE user_id = $1', [userId]);
+    const result = await pool.query('SELECT * FROM notes WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3 ', [userId, limit, (page - 1) * limit]);
+    // console.log(result);
+    console.log(count.rows);
 
-    return result.rows;
+    return { notes: result.rows, totalCount: parseInt(count.rows[0].count), totalPages: Math.ceil(count.rows[0].count / limit), page: parseInt(page), limit: parseInt(limit) };
 }
 
-async function getNotesByUserCategories(userId, categoryId) {
 
-}
+module.exports = { createNote, getNotesByUserId };

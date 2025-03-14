@@ -26,24 +26,28 @@ const signUp = async (req, res) => {
 
 const login = async (req, res) => {
     try {
+        console.log(1);
         const { username, password } = req.body;
+        console.log(2);
         const user = await getUserByUsername(username);
-
+        console.log(3);
         // if user is not registered or if the passowrd is incorrect
         if (!user || !(bcrypt.compare(password, user.password_hash))) {
             res.status(401).json({ message: "Invalid Credentials" });
+            return;
         }
-
         // if the user exists and password is correct
         const { accessToken, refreshToken } = generateTokens(user);
-
+        console.log(6);
         //Saving the refresh token
         await createSession(user.id, refreshToken);
-
+        console.log(7);
         res.status(200).json({ accessToken, refreshToken });
-
+        console.log(8);
     } catch (e) {
+        console.log(9);
         res.status(500).json({ message: "Something went wrong when logging in" });
+        console.log(10);
     }
 }
 
