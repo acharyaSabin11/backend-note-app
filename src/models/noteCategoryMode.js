@@ -5,4 +5,9 @@ async function insertNoteCategory(noteId, categoryId) {
     return result.rows[0];
 }
 
-module.exports = { insertNoteCategory };
+async function deleteNoteCategoryByCategoryId(categoryId) {
+    return await pool.query('DELETE FROM note_category WHERE category_id = $1', [categoryId]);
+}
+
+
+module.exports = { insertNoteCategory, deleteNoteCategoryByCategoryId };

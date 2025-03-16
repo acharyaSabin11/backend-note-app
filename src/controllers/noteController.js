@@ -1,5 +1,5 @@
 const { insertNoteCategory } = require("../models/noteCategoryMode");
-const { createNote, getNotesByUserId } = require("../models/noteModel");
+const { createNote, getNotesByUserId, getNoteDetailById, deleteNoteById, updateNoteById } = require("../models/noteModel");
 
 const handleCreateNote = async (req, res) => {
     try {
@@ -41,5 +41,38 @@ const handleGetNotes = async (req, res) => {
     }
 }
 
+const handleGetNoteDetail = async (req, res) => {
+    try {
+        const noteId = req.params.id;
+        const userId = req.user.id;
+        const data = await getNoteDetailById(noteId, userId);
+        res.status(200).json({ data });
+    } catch (e) {
+        res.status(500).json({ message: "Error Fetching Note" });
+    }
+}
 
-module.exports = { handleCreateNote, handleGetNotes };
+const handleDeleteNote = async (req, res) => {
+    try {
+        const noteId = req.params.id;
+        const data = await deleteNoteById(noteId);
+        res.status(204).json({ data });
+    } catch (e) {
+        res.status(500).json({ message: "Error Deleting Note" });
+    }
+}
+
+const handleUpdateNote = async (req, res) => {
+    try {
+        const noteId = req.params.id;
+        const { title, description, additional_info, addCategories, removeCategories } = req.body;
+        console.log(addCategories);
+        const data = await updateNoteById(noteId, title, description, additional_info, addCategories, removeCategories);
+        console.log(addCategories);
+        res.status(200).json({ message: "Note Updated Successfully", data });
+    } catch (e) {
+        res.status(500).json({ message: "Error Updating Note" });
+    }
+}
+
+module.exports = { handleCreateNote, handleGetNotes, handleGetNoteDetail, handleDeleteNote, handleUpdateNote };
