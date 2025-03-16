@@ -8,10 +8,12 @@ const handleCreateCategory = async (req, res) => {
         const newCategory = await createCategory(title, userId);
         res.status(201).json({ message: "Category Created Successfully", category: newCategory });
     } catch (e) {
-        console.log(e);
-        if (e.code = '23502') {
+        console.log(e.cause);
+        if (e.code == '23502') {
             res.status(500).json({ message: `Invalid ${e.column} of ${e.table}` });
 
+        } else if (e.cause === 'already_exists') {
+            res.status(500).json({ message: "Category already exists" });
         } else {
             res.status(500).json({ message: "Error Creating Category" });
 

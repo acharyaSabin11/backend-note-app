@@ -1,6 +1,10 @@
 const pool = require('../config/db');
 
 async function createCategory(title, userId) {
+    const matchResult = await pool.query('SELECT * FROM category WHERE title = $1 AND user_id = $2', [title, userId]);
+    if (matchResult.rows.length > 0) throw new Error('Category already exists', {
+        cause: "already_exists"
+    });
     const result = await pool.query("INSERT INTO category (title, user_id, created_at) VALUES ($1, $2, NOW()) RETURNING *", [title, userId]);
     return result.rows[0];
 }
