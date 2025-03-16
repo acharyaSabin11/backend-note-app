@@ -7,13 +7,26 @@ async function createNote(title, description, additionalInfo, userId) {
     return result.rows[0];
 }
 
-async function getNotesByUserId(userId, page = 1, limit = 10) {
-    const count = await pool.query('SELECT COUNT(*) FROM notes WHERE user_id = $1', [userId]);
-    const result = await pool.query('SELECT * FROM notes WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3 ', [userId, limit, (page - 1) * limit]);
-    // console.log(result);
-    console.log(count.rows);
+async function getNotesByUserId(userId, page = 1, limit = 10, filter = 'all') {
+    if (!filter || filter === 'all') {
+        const count = await pool.query('SELECT COUNT(*) FROM notes WHERE user_id = $1', [userId]);
+        const result = await pool.query('SELECT * FROM notes WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3 ', [userId, limit, (page - 1) * limit]);
+        // console.log(result);
+        console.log(count.rows);
 
-    return { notes: result.rows, totalCount: parseInt(count.rows[0].count), totalPages: Math.ceil(count.rows[0].count / limit), page: parseInt(page), limit: parseInt(limit) };
+        return { notes: result.rows, totalCount: parseInt(count.rows[0].count), totalPages: Math.ceil(count.rows[0].count / limit), page: parseInt(page), limit: parseInt(limit) };
+    } else {
+        //filtering by category
+        console.log(filter);
+
+
+        const result = await pool.query("SELECT n.* FROM notes n JOIN note_category nc ON n.id = nc.note_id WHERE n.user_id = $1 AND nc.category_id = $2 ORDER BY n.created_at DESC LIMIT $3 OFFSET $4", [userId, filter, limit, (page - 1) * limit]);
+
+
+        console.log(result);
+        const count = await pool.query('SELECT COUNT(*) FROM notes WHERE user_id = $1 AND id IN (SELECT note_id FROM note_category WHERE category_id = $2)', [userId, filter]);
+        return { notes: result.rows, totalCount: parseInt(count.rows[0].count), totalPages: Math.ceil(count.rows[0].count / limit), page: parseInt(page), limit: parseInt(limit) };
+    }
 }
 
 async function getNoteDetailById(noteId) {

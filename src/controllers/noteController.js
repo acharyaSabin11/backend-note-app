@@ -33,8 +33,8 @@ const handleGetNotes = async (req, res) => {
     try {
         console.log(req.user);
         const userId = req.user.id;
-        const { page, limit } = req.query;
-        const data = await getNotesByUserId(userId, page, limit);
+        const { page, limit, filter } = req.query;
+        const data = await getNotesByUserId(userId, page, limit, filter);
         res.status(200).json({ data });
     } catch (e) {
         res.status(500).json({ message: "Error Fetching Notes" });

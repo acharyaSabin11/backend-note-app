@@ -1,4 +1,4 @@
-const { createCategory, getCategoriesByUserId, getCategoriesByUserIdWithPagination } = require("../models/categoryModel");
+const { createCategory, getCategoriesByUserId, getCategoriesByUserIdWithPagination, getCategoryDetailById, deleteCategoryById, updateCategoryById } = require("../models/categoryModel");
 
 const handleCreateCategory = async (req, res) => {
     try {
@@ -40,5 +40,35 @@ const handleGetRecentCategories = async (req, res) => {
     }
 }
 
+const handleGetCategoryDetail = async (req, res) => {
+    try {
+        const categoryId = req.params.id;
+        const data = await getCategoryDetailById(categoryId);
+        res.status(200).json({ data });
+    } catch (e) {
+        res.status(500).json({ message: "Error Fetching Category" });
+    }
+}
 
-module.exports = { handleCreateCategory, handleGetCategories, handleGetRecentCategories };
+const handleDeleteCategory = async (req, res) => {
+    try {
+        const categoryId = req.params.id;
+        const data = await deleteCategoryById(categoryId);
+        res.status(204).json({ data });
+    } catch (e) {
+        res.status(500).json({ message: "Error Deleting Category" });
+    }
+}
+
+const handleUpdateCategory = async (req, res) => {
+    try {
+        const categoryId = req.params.id;
+        const { title } = req.body;
+        const data = await updateCategoryById(categoryId, title);
+        res.status(200).json({ data });
+    } catch (e) {
+        res.status(500).json({ message: "Error Updating Category" });
+    }
+}
+
+module.exports = { handleCreateCategory, handleGetCategories, handleGetRecentCategories, handleGetCategoryDetail, handleDeleteCategory, handleUpdateCategory };

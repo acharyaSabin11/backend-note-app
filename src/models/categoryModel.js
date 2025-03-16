@@ -16,4 +16,24 @@ async function getCategoriesByUserId(userId) {
     return result.rows;
 }
 
-module.exports = { createCategory, getCategoriesByUserId, getCategoriesByUserIdWithPagination };
+async function getCategoryDetailById(categoryId) {
+    const result = await pool.query('SELECT * FROM category WHERE id = $1', [categoryId]);
+    const notes = await pool.query("SELECT n.* FROM notes n JOIN note_category nc ON n.id = nc.note_id WHERE nc.category_id = $1", [categoryId]);
+    return { category: result.rows[0], notes: notes.rows };
+}
+
+async function deleteCategoryById(categoryId) {
+    try {
+        return await pool.query('DELETE FROM category WHERE id = $1', [categoryId]);
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+async function updateCategoryById(categoryId,
+    title) {
+    await pool.query('UPDATE category SET title = $1 WHERE id = $2', [title, categoryId]);
+    return;
+}
+
+module.exports = { createCategory, getCategoriesByUserId, getCategoriesByUserIdWithPagination, getCategoryDetailById, deleteCategoryById, updateCategoryById };
