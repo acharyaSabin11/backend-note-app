@@ -7,6 +7,7 @@ const { createSession } = require('../models/sessionModel');
 const signUp = async (req, res) => {
     try {
         const { username, password } = req.body;
+        console.log(username, password);
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const newUser = await createUser(username, hashedPassword);
@@ -18,32 +19,36 @@ const signUp = async (req, res) => {
             }
         });
     } catch (e) {
-        res.status(500).json({
-            message: "Error Signing Up the User"
-        });
+        console.log(e);
+        if (e.code === '23505') {
+            if (e.detail.includes('username') && e.detail.includes('already exists')) {
+                res.status(409).json({
+                    message: "Username already taken"
+                });
+                return;
+            }
+            res.status(500).json({
+                message: "Error Signing Up the User"
+            });
+        }
     }
 }
 
 const login = async (req, res) => {
     try {
-        console.log(1);
         const { username, password } = req.body;
-        console.log(2);
+        console.log(username, password);
         const user = await getUserByUsername(username);
-        console.log(3);
         // if user is not registered or if the passowrd is incorrect
-        if (!user || !(bcrypt.compare(password, user.password_hash))) {
-            res.status(401).json({ message: "Invalid Credentials" });
-            return;
+        if (!user || !(await bcrypt.compare(password, user.password_hash))) {
+            return res.status(401).json({ message: "Invalid Credentials" });
         }
         // if the user exists and password is correct
         const { accessToken, refreshToken } = generateTokens(user);
-        console.log(6);
         //Saving the refresh token
         await createSession(user.id, refreshToken);
-        console.log(7);
-        res.status(200).json({ accessToken, refreshToken });
-        console.log(8);
+        res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: false, sameSite: 'lax', path: '/' });
+        res.status(200).json({ accessToken, user: { id: user.id, username: user.username } });
     } catch (e) {
         console.log(9);
         res.status(500).json({ message: "Something went wrong when logging in" });

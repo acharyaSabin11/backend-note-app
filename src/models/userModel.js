@@ -11,4 +11,9 @@ async function getUserByUsername(username) {
     return result.rows[0];
 }
 
-module.exports = { createUser, getUserByUsername };
+async function getUserById(id) {
+    const result = await pool.query("SELECT * FROM users where id = $1", [id]);
+    return result.rows[0];
+}
+
+module.exports = { createUser, getUserByUsername, getUserById };
