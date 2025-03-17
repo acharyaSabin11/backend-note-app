@@ -22,7 +22,7 @@ const renewAccessToken = async (req, res) => {
             return res.status(400).send({ message: "Invalid refresh token" });
         }
         // 6. If the refresh token is valid, generate a new access token
-        const accessToken = jwt.sign({ id: user.id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '2m' });
+        const accessToken = jwt.sign({ id: user.id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
         const userData = await getUserById(user.id);
         console.log(userData);
 
