@@ -47,7 +47,7 @@ const login = async (req, res) => {
         const { accessToken, refreshToken } = generateTokens(user);
         //Saving the refresh token
         await createSession(user.id, refreshToken);
-        res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
+        res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true, sameSite: 'none', path: '/' });
         res.status(200).json({ accessToken, user: { id: user.id, username: user.username } });
     } catch (e) {
         console.log(9);
