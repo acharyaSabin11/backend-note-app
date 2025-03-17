@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { createUser, getUserByUsername } = require('../models/userModel');
 const { generateTokens } = require('../utils/tokens');
-const { createSession } = require('../models/sessionModel');
+const { createSession, revokeRefreshToken } = require('../models/sessionModel');
 
 const signUp = async (req, res) => {
     try {
@@ -56,7 +56,15 @@ const login = async (req, res) => {
     }
 }
 
+const logout = async (req, res) => {
+    const userId = req.user.id
+    await revokeRefreshToken(userId);
+    res.clearCookie('refreshToken');
+    res.status(200).json({ message: "Logged out successfully" });
+}
+
 module.exports = {
     signUp,
-    login
+    login,
+    logout
 }

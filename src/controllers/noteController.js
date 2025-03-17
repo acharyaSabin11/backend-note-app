@@ -1,5 +1,5 @@
 const { insertNoteCategory } = require("../models/noteCategoryMode");
-const { createNote, getNotesByUserId, getNoteDetailById, deleteNoteById, updateNoteById } = require("../models/noteModel");
+const { createNote, getNotesByUserId, getNoteDetailById, deleteNoteById, updateNoteById, getSearchedNotes } = require("../models/noteModel");
 
 const handleCreateNote = async (req, res) => {
     try {
@@ -33,8 +33,8 @@ const handleGetNotes = async (req, res) => {
     try {
         console.log(req.user);
         const userId = req.user.id;
-        const { page, limit, filter } = req.query;
-        const data = await getNotesByUserId(userId, page, limit, filter);
+        const { page, limit, filter, sortBy, orderBy } = req.query;
+        const data = await getNotesByUserId(userId, page, limit, filter, sortBy, orderBy);
         res.status(200).json({ data });
     } catch (e) {
         res.status(500).json({ message: "Error Fetching Notes" });
@@ -75,4 +75,18 @@ const handleUpdateNote = async (req, res) => {
     }
 }
 
-module.exports = { handleCreateNote, handleGetNotes, handleGetNoteDetail, handleDeleteNote, handleUpdateNote };
+const handleSearchNotes = async (req, res) => {
+    console.log("Hello");
+    try {
+        const userId = req.user.id;
+        console.log(userId);
+        const { filter } = req.query;
+        console.log(filter);
+        const data = await getSearchedNotes(userId, filter);
+        res.status(200).json({ data });
+    } catch (e) {
+        res.status(500).json({ message: "Error Fetching Notes" });
+    }
+}
+
+module.exports = { handleCreateNote, handleGetNotes, handleGetNoteDetail, handleDeleteNote, handleUpdateNote, handleSearchNotes };

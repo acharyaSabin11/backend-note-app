@@ -13,6 +13,7 @@ const authenticate = (req, res, next) => {
     try {
         const decodedJwt = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
         req.user = decodedJwt;
+        console.log(decodedJwt);
         next();
     } catch (e) {
         res.status(401).json({ message: "Invalid Auth Token" });

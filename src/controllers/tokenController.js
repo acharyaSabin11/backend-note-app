@@ -9,7 +9,7 @@ const renewAccessToken = async (req, res) => {
 
     //2. If there is no refresh token, return an error
     if (!refreshToken) {
-        return res.status(401).send({ message: "No refresh token provided" });
+        return res.status(400).send({ message: "No refresh token provided" });
     }
 
     try {
@@ -19,7 +19,7 @@ const renewAccessToken = async (req, res) => {
         const session = await getSessionByUserId(user.id);
         // 5. If the refresh token is not in the database, return an error
         if (!session || session.token !== refreshToken) {
-            return res.status(401).send({ message: "Invalid refresh token" });
+            return res.status(400).send({ message: "Invalid refresh token" });
         }
         // 6. If the refresh token is valid, generate a new access token
         const accessToken = jwt.sign({ id: user.id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '2m' });
@@ -30,7 +30,7 @@ const renewAccessToken = async (req, res) => {
         res.status(200).json({ accessToken, user: { id: userData.id, username: userData.username } });
     } catch (e) {
         // 8. If there is an error, return an error
-        return res.status(401).send({ message: "Invalid refresh token" });
+        return res.status(400).send({ message: "Invalid refresh token" });
     }
 
 }
